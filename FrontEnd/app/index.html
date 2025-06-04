@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rooflytics AI Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f9f9f9; }
+    h1 { color: #2c3e50; }
+    input, button { padding: 10px; margin: 5px 0; width: 100%; }
+    .card { background: white; border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.05); }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    #loader { display: none; margin-top: 10px; font-style: italic; color: gray; }
+  </style>
+</head>
+<body>
+  <h1>🏗️ Rooflytics AI</h1>
+
+  <div class="card">
+    <h3>Ask a Question</h3>
+    <input type="text" id="question" placeholder="e.g. Which city has the most metal roofs?" />
+    <button onclick="askAI()">Submit</button>
+    <div id="loader">Processing your question...</div>
+  </div>
+
+  <div class="card" id="sql-section" style="display:none;">
+    <h3>🧠 SQL Generated</h3>
+    <pre id="sql"></pre>
+  </div>
+
+  <div class="card" id="result-section" style="display:none;">
+    <h3>📊 Query Results</h3>
+    <table id="results"></table>
+  </div>
+
+  <div class="card" id="summary-section" style="display:none;">
+    <h3>📝 Summary</h3>
+    <p id="summary"></p>
+  </div>
+
+  <script>
+    const ANALYZE_URL = 'https://xapjsarxm8.us-east-1.awsapprunner.com/analyze'; // Replace this with your App Runner /analyze endpoint
+
+    async function askAI() {
+      const question = document.getElementById('question').value;
+      if (!question) return alert("Please enter a question.");
+      
+      document.getElementById('loader').style.display = 'block';
+      document.getElementById('sql-section').style.display = 'none';
+      document.getElementById('result-section').style.display = 'none';
+      document.getElementById('summary-section').style.display = 'none';
+
+      try {
+        const response = await fetch(ANALYZE_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question })
+        });
+
+        const data = await response.json();
+
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('sql').innerText = data.sql || "N/A";
+        document.getElementById('summary').innerText = data.summary || "No summary available.";
+        renderResults(data.result);
+
+        document.getElementById('sql-section').style.display = 'block';
+        document.getElementById('result-section').style.display = 'block';
+        document.getElementById('summary-section').style.display = 'block';
+
+      } catch (error) {
+        document.getElementById('loader').style.display = 'none';
+        alert("Something went wrong: " + error);
+      }
+    }
+
+    function renderResults(data) {
+      const table = document.getElementById('results');
+      table.innerHTML = "";
+      if (!Array.isArray(data) || data.length === 0) {
+        table.innerHTML = "<tr><td>No results found.</td></tr>";
+        return;
+      }
+
+      const headers = Object.keys(data[0]);
+      table.innerHTML += `<tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+      data.forEach(row => {
+        table.innerHTML += `<tr>${headers.map(h => `<td>${row[h]}</td>`).join('')}</tr>`;
+      });
+    }
+  </script>
+</body>
+</html>
