@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooflytics.AI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Times New Roman", serif;
+            background: #101010ef;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 80px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 60px;
+        }
+
+       
+
+        
+
+        .company-title {
+            font-size: 3rem;
+            font-weight: normal;
+        }
+
+        .company-title .ai {
+            font-weight: 900;
+            color: #14b8a6;
+            letter-spacing: 2px;
+        }
+
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 0 20px;
+        }
+
+        .search-form {
+            display: flex;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 8px;
+            gap: 8px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 16px;
+            font-family: "Times New Roman", serif;
+            padding: 12px 16px;
+        }
+
+        .search-input::placeholder {
+            color: #666;
+        }
+
+        .submit-btn {
+            background: #14b8a6;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: "Times New Roman", serif;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #0f9488;
+        }
+
+        .submit-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+
+        .submit-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .results-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 20px;
+            margin-top: 40px;
+            display: none;
+        }
+
+        .flip-card {
+            perspective: 1000px;
+            min-height: 200px;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            min-height: 200px;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front,
+        .flip-card-back {
+            position: absolute;
+            width: 100%;
+            min-height: 200px;
+            backface-visibility: hidden;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 24px;
+        }
+
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+
+        .results-title {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 16px;
+            font-weight: normal;
+        }
+
+        .loading-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: calc(100% - 40px);
+            gap: 12px;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #2a2a2a;
+            border-top: 2px solid #14b8a6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #ccc;
+            font-size: 16px;
+        }
+
+        .result-content {
+            color: white;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .summary-text {
+            background: #0f0f0f;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            color: #e0e0e0;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: #2a1a1a;
+            border: 1px solid #ff6b6b;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 768px) {
+            .company-title {
+                font-size: 2rem;
+            }
+            
+            .search-container,
+            .results-container {
+                max-width: 90%;
+            }
+
+            .summary-text {
+                font-size: 14px;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <div class="company-icon">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                <path d="M8 11h8v2H8z"/>
+                <path d="M8 15h8v2H8z"/>
+            </svg>
+        </div>
+        <h1 class="company-title">
+            Rooflytics<span class="ai">.AI</span>
+        </h1>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-container">
+        <form class="search-form" id="searchForm">
+            <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Which city has highest sale?"
+                id="searchInput"
+            >
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+                </svg>
+                Submit
+            </button>
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-container" id="resultsContainer">
+        <div class="flip-card">
+            <div class="flip-card-inner" id="flipCardInner">
+                <!-- Front Side - Loading -->
+                <div class="flip-card-front">
+                    <div class="results-title">Results</div>
+                    <div class="loading-content">
+                        <div class="spinner"></div>
+                        <div class="loading-text">Processing your question...</div>
+                    </div>
+                </div>
+
+                <!-- Back Side - Results -->
+                <div class="flip-card-back">
+                    <div class="results-title">Results</div>
+                    <div class="result-content" id="resultContent">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ANALYZE_URL = 'https://xapjsarxm8.us-east-1.awsapprunner.com/analyze';
+
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            askAI();
+        });
+
+        async function askAI() {
+            const question = document.getElementById('searchInput').value;
+            if (!question.trim()) {
+                alert("Please enter a question.");
+                return;
+            }
+            
+            const resultsContainer = document.getElementById('resultsContainer');
+            const flipCardInner = document.getElementById('flipCardInner');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Show results container and reset flip state
+            resultsContainer.style.display = 'block';
+            flipCardInner.classList.remove('flipped');
+            submitBtn.disabled = true;
+
+            try {
+                const response = await fetch(ANALYZE_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Render only the summary
+                renderSummary(data.summary);
+                
+                // Flip to show results
+                setTimeout(() => {
+                    flipCardInner.classList.add('flipped');
+                }, 500);
+
+            } catch (error) {
+                console.error('Error:', error);
+                renderError(error.message);
+                setTimeout(() => {
+                    flipCardInner.classList.add('flipped');
+                }, 500);
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+
+        function renderSummary(summary) {
+            const resultContent = document.getElementById('resultContent');
+            
+            if (summary && summary.trim()) {
+                resultContent.innerHTML = `<div class="summary-text">${escapeHtml(summary)}</div>`;
+            } else {
+                resultContent.innerHTML = `<div class="summary-text">No summary available for your question. Please try rephrasing your query.</div>`;
+            }
+        }
+
+        function renderError(errorMessage) {
+            const resultContent = document.getElementById('resultContent');
+            resultContent.innerHTML = `
+                <div class="error-message">
+                    <p>Something went wrong: ${escapeHtml(errorMessage)}</p>
+                    <p>Please try again or check your connection.</p>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
