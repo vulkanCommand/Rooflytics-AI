@@ -1,6 +1,6 @@
-MediCRM: AI-Powered EHR Analytics Platform
-Overview
-MediCRM is a next-generation, AI-integrated Electronic Health Record (EHR) analytics platform built to support small and mid-sized healthcare providers. Focused on leveraging FHIR standards, MediCRM empowers clinics, practices, and medical administrators with real-time insights without the need for data analysts.
+#Medlytics: AI-Powered EHR Analytics Platform
+#Overview
+Medlytics is a next-generation, AI-integrated Electronic Health Record (EHR) analytics platform built to support small and mid-sized healthcare providers. Focused on leveraging FHIR standards, MediCRM empowers clinics, practices, and medical administrators with real-time insights without the need for data analysts.
 
 By combining OpenAI’s GPT-based natural language processing with structured EHR data from FHIR-compatible databases, the platform allows medical professionals to ask plain-English questions like:
 
