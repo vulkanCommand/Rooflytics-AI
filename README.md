@@ -1,5 +1,15 @@
-# BuildCRM: AI-Powered CRM Analytics Platform
+MediCRM: AI-Powered EHR Analytics Platform
+Overview
+MediCRM is a next-generation, AI-integrated Electronic Health Record (EHR) analytics platform built to support small and mid-sized healthcare providers. Focused on leveraging FHIR standards, MediCRM empowers clinics, practices, and medical administrators with real-time insights without the need for data analysts.
 
-## Overview
+By combining OpenAI’s GPT-based natural language processing with structured EHR data from FHIR-compatible databases, the platform allows medical professionals to ask plain-English questions like:
 
-BuildCRM is a modern AI-integrated CRM analytics platform designed to empower small and medium businesses—especially in the Home Improvement and Light Commercial Building Materials sectors—with intelligent sales insights and decision-making capabilities. It eliminates the need for expensive data analysts by allowing users to ask natural-language questions and get insights directly from the database, powered by OpenAI’s GPT-based NLP.
+“Which patients are at risk for readmission in the next 30 days?”
+
+“Which doctor has the highest number of hypertensive patients?”
+
+“What medications are most frequently prescribed in the cardiology department?”
+
+MediCRM converts these natural-language queries into optimized SQL, fetches data from PostgreSQL, and delivers clear, conversational answers—within seconds.
+
+This platform is designed to improve operational efficiency, reduce administrative overhead, and help healthcare teams make faster, smarter, and more data-driven decisions—all through a clean, user-friendly interface powered by modern cloud-native microservices and FHIR integration.
